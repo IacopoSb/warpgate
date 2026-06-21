@@ -73,7 +73,11 @@ impl russh::server::Handler for ServerHandler {
     type Error = anyhow::Error;
 
     async fn authentication_banner(&mut self) -> Result<Option<String>, Self::Error> {
-        Ok(self.login_banner.clone().map(|b| b.replace('\n', "\r\n")))
+        Ok(self.login_banner.clone().map(|b| {
+            // Normalize any line ending to CRLF as expected by the SSH protocol,
+            // without doubling CRs when the configured value already uses CRLF.
+            b.replace("\r\n", "\n").replace('\r', "\n").replace('\n', "\r\n")
+        }))
     }
 
     async fn auth_succeeded(&mut self, session: &mut Session) -> Result<(), Self::Error> {
@@ -585,6 +589,17 @@ mod tests {
         let mut handler = ServerHandler {
             event_tx: tx,
             login_banner: Some("line1\nline2".to_string()),
+        };
+        let banner = handler.authentication_banner().await.unwrap();
+        assert_eq!(banner, Some("line1\r\nline2".to_string()));
+    }
+
+    #[tokio::test]
+    async fn authentication_banner_does_not_double_existing_crlf() {
+        let (tx, _rx) = unbounded_channel();
+        let mut handler = ServerHandler {
+            event_tx: tx,
+            login_banner: Some("line1\r\nline2".to_string()),
         };
         let banner = handler.authentication_banner().await.unwrap();
         assert_eq!(banner, Some("line1\r\nline2".to_string()));
