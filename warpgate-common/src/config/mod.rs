@@ -300,9 +300,6 @@ pub struct SshConfig {
 
     #[serde(default)]
     pub keepalive_interval: Option<Duration>,
-
-    #[serde(default)]
-    pub banner: Option<String>,
 }
 
 impl Default for SshConfig {
@@ -316,7 +313,6 @@ impl Default for SshConfig {
             external_host: None,
             inactivity_timeout: _default_ssh_inactivity_timeout(),
             keepalive_interval: None,
-            banner: None,
         }
     }
 }
@@ -367,9 +363,6 @@ pub struct HttpConfig {
 
     #[serde(default)]
     pub sni_certificates: Vec<SniCertificateConfig>,
-
-    #[serde(default)]
-    pub login_banner: Option<String>,
 }
 
 impl Default for HttpConfig {
@@ -384,7 +377,6 @@ impl Default for HttpConfig {
             session_max_age: _default_session_max_age(),
             cookie_max_age: _default_cookie_max_age(),
             sni_certificates: vec![],
-            login_banner: None,
         }
     }
 }
@@ -677,33 +669,5 @@ impl WarpgateConfig {
                 "Set the external port via the `http.external_port`, `ssh.external_port` or `mysql.external_port` options."
             );
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::WarpgateConfigStore;
-
-    #[test]
-    fn login_banner_fields_deserialize() {
-        let yaml = r#"
-ssh:
-  banner: "SSH: authorized access only"
-http:
-  login_banner: "Web: monitored and recorded"
-"#;
-        let store: WarpgateConfigStore = serde_yaml::from_str(yaml).unwrap();
-        assert_eq!(store.ssh.banner.as_deref(), Some("SSH: authorized access only"));
-        assert_eq!(
-            store.http.login_banner.as_deref(),
-            Some("Web: monitored and recorded")
-        );
-    }
-
-    #[test]
-    fn login_banner_fields_default_to_none() {
-        let store: WarpgateConfigStore = serde_yaml::from_str("{}").unwrap();
-        assert_eq!(store.ssh.banner, None);
-        assert_eq!(store.http.login_banner, None);
     }
 }

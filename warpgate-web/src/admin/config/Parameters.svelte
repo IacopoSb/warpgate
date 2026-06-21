@@ -56,6 +56,34 @@
                     </label>
                 </Section>
 
+                <Section id="banners" title="Banners">
+                    <FormGroup floating label="Web login banner">
+                        <textarea
+                            class="form-control"
+                            style="min-height: 6rem"
+                            value={parameters.httpBanner}
+                            onchange={e => {
+                                parameters!.httpBanner = e.currentTarget.value
+                                update()
+                            }}
+                        ></textarea>
+                    </FormGroup>
+                    <FormGroup floating label="SSH login banner">
+                        <textarea
+                            class="form-control"
+                            style="min-height: 6rem"
+                            value={parameters.sshBanner}
+                            onchange={e => {
+                                parameters!.sshBanner = e.currentTarget.value
+                                update()
+                            }}
+                        ></textarea>
+                    </FormGroup>
+                    <InfoBox class="mt-3 mb-3">
+                        Optional plain-text disclaimers shown before authentication: the web banner appears on the login page, the SSH banner is sent to SSH clients pre-authentication. Leave empty to disable.
+                    </InfoBox>
+                </Section>
+
                 <Section id="password-policy" title="Password policy">
                     <FormGroup floating label="Minimum length (0 = no requirement)">
                         <input

@@ -265,7 +265,8 @@ impl Api {
             selected_target: session.get_target_name(),
             external_host,
             minimize_password_login: parameters.minimize_password_login,
-            login_banner: config.store.http.login_banner.clone(),
+            login_banner: (!parameters.http_banner.is_empty())
+                .then(|| parameters.http_banner.clone()),
             authorized_via_ticket: matches!(
                 session.get_auth(),
                 Some(SessionAuthorization::Ticket { .. })

@@ -45,6 +45,10 @@ pub struct Model {
     pub max_api_token_duration_seconds: Option<i64>,
     pub record_scp: bool,
     pub tutorial_dismissed: bool,
+    #[sea_orm(column_type = "Text")]
+    pub ssh_banner: String,
+    #[sea_orm(column_type = "Text")]
+    pub http_banner: String,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
@@ -95,6 +99,8 @@ impl Entity {
                     max_api_token_duration_seconds: Set(None),
                     record_scp: Set(true),
                     tutorial_dismissed: Set(false),
+                    ssh_banner: Set("".into()),
+                    http_banner: Set("".into()),
                 }
                 .insert(db)
                 .await

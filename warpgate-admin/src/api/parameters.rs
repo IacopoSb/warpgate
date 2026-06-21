@@ -32,6 +32,8 @@ struct ParameterValues {
     pub password_policy: PasswordPolicy,
     pub max_api_token_duration_seconds: Option<i64>,
     pub record_scp: bool,
+    pub ssh_banner: String,
+    pub http_banner: String,
 }
 
 #[derive(Serialize, Object)]
@@ -53,6 +55,8 @@ struct ParameterUpdate {
     pub password_policy: Option<PasswordPolicy>,
     pub max_api_token_duration_seconds: Option<Option<i64>>,
     pub record_scp: Option<bool>,
+    pub ssh_banner: Option<String>,
+    pub http_banner: Option<String>,
 }
 
 #[derive(ApiResponse)]
@@ -98,6 +102,8 @@ impl Api {
             password_policy: parameters.password_policy(),
             max_api_token_duration_seconds: parameters.max_api_token_duration_seconds,
             record_scp: parameters.record_scp,
+            ssh_banner: parameters.ssh_banner.clone(),
+            http_banner: parameters.http_banner.clone(),
         })))
     }
 
@@ -142,6 +148,8 @@ impl Api {
         parameters.max_api_token_duration_seconds =
             body.max_api_token_duration_seconds.map_or(NotSet, Set);
         parameters.record_scp = body.record_scp.map_or(NotSet, Set);
+        parameters.ssh_banner = body.ssh_banner.clone().map_or(NotSet, Set);
+        parameters.http_banner = body.http_banner.clone().map_or(NotSet, Set);
 
         #[allow(clippy::cast_possible_wrap)]
         if let Some(ref policy) = body.password_policy {
