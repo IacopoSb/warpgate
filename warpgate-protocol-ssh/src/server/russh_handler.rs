@@ -52,6 +52,7 @@ pub enum ServerHandlerEvent {
 
 pub struct ServerHandler {
     pub event_tx: UnboundedSender<ServerHandlerEvent>,
+    pub login_banner: Option<String>,
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -70,6 +71,10 @@ impl ServerHandler {
 
 impl russh::server::Handler for ServerHandler {
     type Error = anyhow::Error;
+
+    async fn authentication_banner(&mut self) -> Result<Option<String>, Self::Error> {
+        Ok(self.login_banner.clone().map(|b| b.replace('\n', "\r\n")))
+    }
 
     async fn auth_succeeded(&mut self, session: &mut Session) -> Result<(), Self::Error> {
         let handle = session.handle();
@@ -564,5 +569,35 @@ impl Drop for ServerHandler {
 impl Debug for ServerHandler {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "ServerHandler")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use russh::server::Handler;
+    use tokio::sync::mpsc::unbounded_channel;
+
+    use super::ServerHandler;
+
+    #[tokio::test]
+    async fn authentication_banner_returns_crlf_normalized_banner() {
+        let (tx, _rx) = unbounded_channel();
+        let mut handler = ServerHandler {
+            event_tx: tx,
+            login_banner: Some("line1\nline2".to_string()),
+        };
+        let banner = handler.authentication_banner().await.unwrap();
+        assert_eq!(banner, Some("line1\r\nline2".to_string()));
+    }
+
+    #[tokio::test]
+    async fn authentication_banner_none_when_unset() {
+        let (tx, _rx) = unbounded_channel();
+        let mut handler = ServerHandler {
+            event_tx: tx,
+            login_banner: None,
+        };
+        let banner = handler.authentication_banner().await.unwrap();
+        assert_eq!(banner, None);
     }
 }

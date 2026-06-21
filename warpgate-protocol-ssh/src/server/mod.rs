@@ -86,7 +86,14 @@ async fn _handle_connection(
 
     let (event_tx, event_rx) = unbounded_channel();
 
-    let handler = ServerHandler { event_tx };
+    let login_banner = {
+        let config = services.config.lock().await;
+        config.store.ssh.banner.clone()
+    };
+    let handler = ServerHandler {
+        event_tx,
+        login_banner,
+    };
     let wrapped_stream = {
         let guard = server_handle.lock().await;
         guard.wrap_stream(stream).await?
