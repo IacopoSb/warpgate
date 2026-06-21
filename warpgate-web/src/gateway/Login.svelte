@@ -173,6 +173,9 @@
 <Loadable promise={initPromise}>
 
     <div class="mt-5">
+        {#if $serverInfo?.loginBanner}
+            <div class="login-banner" role="note">{$serverInfo.loginBanner}</div>
+        {/if}
         <div class="page-summary-bar">
             {#if authState === ApiAuthState.NotStarted || authState === ApiAuthState.Failed || authState === ApiAuthState.IpRejected}
                 <h1>Welcome</h1>
@@ -286,6 +289,16 @@
 <style lang="scss">
     h1 {
         font-size: 3rem;
+    }
+
+    .login-banner {
+        white-space: pre-line;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+        background: var(--bs-secondary-bg);
+        font-size: 0.9rem;
     }
 
     .sso-buttons {
