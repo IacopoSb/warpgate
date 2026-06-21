@@ -87,8 +87,9 @@ async fn _handle_connection(
     let (event_tx, event_rx) = unbounded_channel();
 
     let login_banner = {
-        let config = services.config.lock().await;
-        config.store.ssh.banner.clone()
+        let db = services.db.lock().await;
+        let parameters = Parameters::Entity::get(&db).await?;
+        (!parameters.ssh_banner.is_empty()).then(|| parameters.ssh_banner.clone())
     };
     let handler = ServerHandler {
         event_tx,
