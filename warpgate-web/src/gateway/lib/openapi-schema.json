@@ -1803,6 +1803,9 @@
           },
           "running_on_ec2": {
             "type": "boolean"
+          },
+          "login_banner": {
+            "type": "string"
           }
         }
       },

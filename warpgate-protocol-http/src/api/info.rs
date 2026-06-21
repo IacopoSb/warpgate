@@ -99,6 +99,7 @@ pub struct Info {
     setup_state: Option<SetupState>,
     admin_permissions: Option<AdminPermissions>,
     running_on_ec2: Option<bool>,
+    login_banner: Option<String>,
 }
 
 #[derive(ApiResponse)]
@@ -264,6 +265,7 @@ impl Api {
             selected_target: session.get_target_name(),
             external_host,
             minimize_password_login: parameters.minimize_password_login,
+            login_banner: config.store.http.login_banner.clone(),
             authorized_via_ticket: matches!(
                 session.get_auth(),
                 Some(SessionAuthorization::Ticket { .. })
