@@ -23,6 +23,7 @@
         "external_port": null,
         "key": "",
         "listen": "[::]:8888",
+        "login_banner": null,
         "session_max_age": "30m",
         "sni_certificates": [],
         "trust_x_forwarded_headers": false
@@ -82,6 +83,7 @@
     "ssh": {
       "$ref": "#/$defs/SshConfig",
       "default": {
+        "banner": null,
         "enable": false,
         "external_host": null,
         "external_port": null,
@@ -155,6 +157,13 @@
         "listen": {
           "$ref": "#/$defs/ListenEndpoint",
           "default": "[::]:8888"
+        },
+        "login_banner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
         },
         "session_max_age": {
           "type": "string",
@@ -375,6 +384,13 @@
     "SshConfig": {
       "type": "object",
       "properties": {
+        "banner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
         "enable": {
           "type": "boolean",
           "default": false
